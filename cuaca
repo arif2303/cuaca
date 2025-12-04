@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cuaca WIOO</title>
+<style>
+textarea {
+  width: 100%;
+  height: 300px;
+  font-family: monospace;
+  font-size: 15px;
+}
+button {
+  padding: 10px 20px;
+}
+</style>
+</head>
+<body>
+
+<h2>Input Cuaca WIOO</h2>
+
+<textarea id="input"></textarea><br><br>
+
+<button onclick="save()">💾 Simpan</button>
+
+<hr>
+
+<h2>Data Terakhir</h2>
+
+<textarea id="output" readonly></textarea>
+
+<script>
+// GANTI dengan URL script Anda
+const API = "https://script.google.com/macros/s/xxxxxxxx/exec";
+
+// LOAD DATA
+fetch(API)
+.then(r => r.text())
+.then(text => document.getElementById("output").value = text);
+
+// SAVE DATA
+function save(){
+  let cuaca = document.getElementById("input").value;
+
+  fetch(API, {
+    method: "POST",
+    body: new URLSearchParams({ cuaca })
+  })
+  .then(() => alert("✔ Data Tersimpan"))
+  .then(() => location.reload());
+}
+</script>
+
+</body>
+</html>
