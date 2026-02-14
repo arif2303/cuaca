@@ -1,44 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Cuaca WIOO</title>
+<title>Monitoring QAM WIOO</title>
+
 <style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #e6ebf0, #cfd8df);
+  color: #2c3e50;
+}
+
+.wrapper {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* ================= HEADER ================= */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 2px solid #dde5ec;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.header img {
+  width: 75px;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sub-title {
+  font-size: 14px;
+  color: #607d8b;
+}
+
+/* ================= TIME BOX ================= */
+
+.datetime-box {
+  background: #f2f6f9;
+  padding: 12px 15px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ================= TEXTAREA ================= */
+
 textarea {
   width: 100%;
-  height: 300px;
+  height: 220px;
   font-family: monospace;
-  font-size: 15px;
+  font-size: 14px;
+  border-radius: 12px;
+  border: 1px solid #ccd6dd;
+  padding: 12px;
+  background: #f8fafc;
+  resize: vertical;
 }
+
+/* ================= BUTTON ================= */
+
 button {
-  padding: 10px 20px;
+  margin-top: 10px;
+  padding: 10px 25px;
+  border-radius: 8px;
+  border: none;
+  background-color: #607d8b;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background-color: #455a64;
+}
+
+/* ================= FOOTER ================= */
+
+.footer {
+  margin-top: 25px;
+  font-size: 12px;
+  text-align: center;
+  color: #78909c;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #dde5ec;
+  margin: 25px 0;
 }
 </style>
 </head>
+
 <body>
 
-<h2>Input Cuaca WIOO</h2>
+<div class="wrapper">
+<div class="card">
 
-<textarea id="input"></textarea><br><br>
+<!-- ================= HEADER ================= -->
 
-<button onclick="save()">💾 Simpan</button>
+<div class="header">
+  <img src="logo-bmkg.png" alt="Logo BMKG">
+  <div>
+    <div class="header-title">
+      BADAN METEOROLOGI, KLIMATOLOGI, DAN GEOFISIKA
+    </div>
+    <div class="sub-title">
+      STASIUN METEOROLOGI KELAS I SUPADIO
+    </div>
+  </div>
+</div>
+
+<!-- ================= TIME ================= -->
+
+<div class="datetime-box">
+  <div id="localTime"></div>
+  <div id="utcTime"></div>
+</div>
+
+<!-- ================= INPUT ================= -->
+
+<h3>Input Data Cuaca WIOO</h3>
+<textarea id="input" placeholder="Masukkan data cuaca di sini..."></textarea>
+<button onclick="save()">💾 Simpan Data</button>
 
 <hr>
 
-<h2>Data Terakhir</h2>
+<!-- ================= OUTPUT ================= -->
 
+<h3>Data Terakhir</h3>
 <textarea id="output" readonly></textarea>
 
-<script>
-// GANTI dengan URL script Anda
-const API = "https://script.google.com/macros/s/AKfycbzu2PeeAEdMURnGFz2HJCHHIQSvFUzsHTBKV2JwRd46uomg0vh8VS5Mmtk38406EbTJZQ/exec";
+<!-- ================= FOOTER ================= -->
 
-// LOAD DATA
+<div class="footer">
+  Sistem Monitoring Internal – Stasiun Meteorologi Kelas I Supadio
+</div>
+
+</div>
+</div>
+
+<script>
+
+// ==========================
+// JAM LOKAL & UTC REALTIME
+// ==========================
+function updateDateTime(){
+  const now = new Date();
+
+  const localDate = now.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  const localTime = now.toLocaleTimeString('id-ID');
+
+  const utcHours = String(now.getUTCHours()).padStart(2, '0');
+  const utcMinutes = String(now.getUTCMinutes()).padStart(2, '0');
+  const utcSeconds = String(now.getUTCSeconds()).padStart(2, '0');
+
+  document.getElementById("localTime").innerHTML =
+    "Waktu Lokal (WIB) : " + localDate + " | " + localTime + " WIB";
+
+  document.getElementById("utcTime").innerHTML =
+    "Waktu UTC : " + utcHours + ":" + utcMinutes + ":" + utcSeconds + " UTC";
+}
+
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+
+// ==========================
+// API BACKEND
+// ==========================
+
+const API = "https://script.google.com/macros/s/AKfycbzu2PeeAEdMURnGFz2HJCHHIQSvFUzsHTBKV2JwRd46uomg0vh8VS5Mmtk38406EbTJZQ/exec"; // Ganti dengan URL script Anda
+
 fetch(API)
 .then(r => r.text())
 .then(text => document.getElementById("output").value = text);
 
-// SAVE DATA
 function save(){
   let cuaca = document.getElementById("input").value;
 
@@ -49,6 +211,7 @@ function save(){
   .then(() => alert("✔ Data Tersimpan"))
   .then(() => location.reload());
 }
+
 </script>
 
 </body>
